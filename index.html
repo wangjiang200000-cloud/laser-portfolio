@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>激光设计师 JOY</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Noto+Sans+SC:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#050508;--green:#00ff87;--blue:#00c8ff;--white:#f0f0f0;--dim:rgba(255,255,255,0.4)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:'Noto Sans SC','Space Grotesk',sans-serif;overflow-x:hidden;cursor:none}
+.cursor{width:6px;height:6px;background:var(--green);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;box-shadow:0 0 10px var(--green),0 0 20px var(--green)}
+.cursor-ring{width:40px;height:40px;border:1px solid rgba(0,255,135,0.3);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .2s ease}
+.grid-bg{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,255,135,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,135,0.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+.scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);opacity:0.15;animation:scan 8s linear infinite;pointer-events:none;z-index:1}
+@keyframes scan{0%{top:0}100%{top:100%}}
+nav{position:fixed;top:0;width:100%;padding:30px 60px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:linear-gradient(to bottom,var(--bg) 0%,transparent 100%)}
+.logo{font-size:14px;font-weight:300;letter-spacing:4px;color:var(--dim)}
+.nav-links{display:flex;gap:50px}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:12px;letter-spacing:2px;font-weight:300;transition:all .3s ease;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-5px;left:0;width:0;height:1px;background:var(--green);transition:width .3s ease}
+.nav-links a:hover{color:var(--white)}.nav-links a:hover::after{width:100%}
+section{padding:150px 60px;position:relative;z-index:2}
+.section-label{font-size:10px;letter-spacing:6px;color:var(--green);margin-bottom:60px;display:flex;align-items:center;gap:20px}
+.section-label::before{content:'';width:60px;height:1px;background:var(--green);opacity:0.5}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;padding:0 40px}
+.hero-content{text-align:center;z-index:2}
+.hero-subtitle{font-size:11px;letter-spacing:8px;color:var(--green);margin-bottom:30px;opacity:0;animation:fadeUp 1s ease forwards .5s}
+.hero-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(48px,10vw,140px);font-weight:300;letter-spacing:-2px;line-height:.95;margin-bottom:40px;opacity:0;animation:fadeUp 1s ease forwards .8s}
+.hero-title .highlight{background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:14px;font-weight:200;color:var(--dim);max-width:400px;line-height:2;letter-spacing:1px;opacity:0;animation:fadeUp 1s ease forwards 1.1s}
+.laser-container{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:1}
+.laser-beam{position:absolute;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent);opacity:0.2;animation:beamMove 10s ease-in-out infinite}
+.laser-beam:nth-child(1){top:20%;animation-delay:0s;animation-duration:12s}
+.laser-beam:nth-child(2){top:35%;animation-delay:-3s;animation-duration:15s}
+.laser-beam:nth-child(3){top:55%;animation-delay:-6s;animation-duration:10s}
+.laser-beam:nth-child(4){top:75%;animation-delay:-2s;animation-duration:14s}
+.laser-beam:nth-child(5){top:90%;animation-delay:-8s;animation-duration:11s}
+@keyframes beamMove{0%,100%{transform:translateX(-100%) scaleX(.5);opacity:0}25%{opacity:0.3}50%{transform:translateX(100%) scaleX(1);opacity:0.15}75%{opacity:0.3}}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start}
+.about-left h2{font-family:'Space Grotesk',sans-serif;font-size:48px;font-weight:300;margin-bottom:40px;line-height:1.2}
+.about-left h2 span{color:var(--green)}
+.about-right{padding-top:80px}
+.about-right p{font-size:15px;font-weight:200;line-height:2.2;color:var(--dim);margin-bottom:30px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:60px;border-top:1px solid rgba(255,255,255,0.1);padding-top:40px}
+.stat-item{text-align:center}
+.stat-number{font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:300;color:var(--white);margin-bottom:10px}
+.stat-number span{color:var(--green)}
+.stat-label{font-size:11px;letter-spacing:2px;color:var(--dim)}
+.works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:60px}
+.work-card{position:relative;aspect-ratio:4/3;overflow:hidden;cursor:pointer;transition:all .5s ease}
+.work-card:hover{transform:translateY(-10px)}
+.work-card img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.work-card:hover img{transform:scale(1.05)}
+.work-card-overlay{position:absolute;bottom:0;left:0;width:100%;padding:30px;background:linear-gradient(transparent,rgba(5,5,8,0.95))}
+.work-category{font-size:10px;letter-spacing:3px;color:var(--green);margin-bottom:8px}
+.work-title{font-size:16px;font-weight:300;margin-bottom:5px}
+.work-year{font-size:12px;color:var(--dim)}
+.more-works-btn{display:flex;align-items:center;justify-content:center;gap:15px;margin-top:60px;padding:20px 50px;font-size:12px;letter-spacing:3px;color:var(--green);background:transparent;border:1px solid var(--green);cursor:pointer;transition:all .3s ease;text-decoration:none}
+.more-works-btn:hover{background:rgba(0,255,135,0.1);transform:translateY(-3px)}
+.more-works-btn svg{width:16px;height:16px;fill:currentColor}
+.all-works-section{display:none;padding:100px 60px}
+.all-works-section.active{display:block}
+.works-list{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:60px}
+.works-list .work-card{aspect-ratio:16/10}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px;margin-top:60px}
+.skill-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);padding:40px;transition:all .4s ease;position:relative;overflow:hidden}
+.skill-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--green),var(--blue));transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+.skill-card:hover::before{transform:scaleX(1)}
+.skill-card:hover{background:rgba(0,255,135,0.03);border-color:rgba(0,255,135,0.2);transform:translateY(-5px)}
+.skill-icon{font-size:40px;margin-bottom:20px}
+.skill-card h3{font-size:20px;font-weight:300;margin-bottom:15px}
+.skill-card p{font-size:13px;color:var(--dim);line-height:1.8}
+.timeline{margin-top:80px;position:relative;padding-left:40px}
+.timeline::before{content:'';position:absolute;left:0;top:0;width:1px;height:100%;background:linear-gradient(180deg,var(--green),transparent)}
+.timeline-item{margin-bottom:60px;position:relative}
+.timeline-item::before{content:'';position:absolute;left:-44px;top:5px;width:9px;height:9px;border:1px solid var(--green);background:var(--bg);transform:rotate(45deg)}
+.timeline-year{font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--green);letter-spacing:2px;margin-bottom:10px}
+.timeline-title{font-size:20px;font-weight:300;margin-bottom:15px}
+.timeline-desc{font-size:14px;font-weight:200;color:var(--dim);line-height:1.8}
+.contact{text-align:center;padding:200px 60px}
+.contact-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,6vw,72px);font-weight:300;margin-bottom:40px;line-height:1.3}
+.contact-info{margin-bottom:30px}
+.contact-email{font-size:16px;color:var(--dim);text-decoration:none;letter-spacing:2px;transition:all .3s ease;position:relative;display:inline-block}
+.contact-email::after{content:'';position:absolute;bottom:-5px;left:0;width:100%;height:1px;background:var(--green);transform:scaleX(0);transition:transform .3s ease}
+.contact-email:hover{color:var(--white)}.contact-email:hover::after{transform:scaleX(1)}
+.contact-links{display:flex;justify-content:center;gap:40px;margin-top:40px}
+.contact-link{font-size:12px;letter-spacing:2px;color:var(--dim);text-decoration:none;transition:all .3s ease;cursor:pointer}
+.contact-link:hover{color:var(--green)}
+footer{padding:40px 60px;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center}
+.footer-left{font-size:11px;color:var(--dim);letter-spacing:1px}
+.footer-right{display:flex;gap:30px}
+.footer-right a{font-size:11px;color:var(--dim);text-decoration:none;letter-spacing:1px;transition:color .3s ease;cursor:pointer}
+.footer-right a:hover{color:var(--white)}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,8,0.98);z-index:2000;padding:60px;overflow-y:auto}
+.modal.active{display:flex;flex-direction:column}
+.modal-close{position:absolute;top:30px;right:30px;width:50px;height:50px;background:none;border:1px solid var(--dim);color:var(--white);font-size:24px;cursor:pointer;transition:all .3s ease}
+.modal-close:hover{border-color:var(--green);color:var(--green)}
+.modal-content{max-width:1200px;margin:0 auto;width:100%}
+.modal-header{margin-bottom:40px}
+.modal-category{font-size:10px;letter-spacing:3px;color:var(--green);margin-bottom:10px}
+.modal-title{font-size:36px;font-weight:300;margin-bottom:10px}
+.modal-links{display:flex;gap:15px;margin-top:20px;flex-wrap:wrap}
+.modal-link{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;font-size:12px;letter-spacing:1px;color:var(--white);background:rgba(0,255,135,0.1);border:1px solid rgba(0,255,135,0.3);text-decoration:none;transition:all .3s ease}
+.modal-link:hover{background:rgba(0,255,135,0.2);border-color:var(--green)}
+.modal-images{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.modal-image{width:100%;aspect-ratio:16/10;object-fit:cover;cursor:pointer;transition:all .3s ease;border:1px solid rgba(255,255,255,0.05)}
+.modal-image:hover{transform:scale(1.02);border-color:var(--green)}
+.qr-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,8,0.95);z-index:3000;justify-content:center;align-items:center}
+.qr-modal.active{display:flex}
+.qr-content{text-align:center;padding:60px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);max-width:400px}
+.qr-content h3{font-size:24px;font-weight:300;margin-bottom:30px;color:var(--green)}
+.qr-placeholder{width:250px;height:250px;margin:0 auto;border:1px dashed rgba(0,255,135,0.3);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px}
+.qr-content p{font-size:14px;color:var(--dim);margin-top:20px}
+.qr-close{margin-top:30px;padding:12px 30px;font-size:12px;letter-spacing:2px;color:var(--dim);background:none;border:1px solid var(--dim);cursor:pointer;transition:all .3s ease}
+.qr-close:hover{border-color:var(--green);color:var(--green)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(40px);transition:all .8s ease}
+.reveal.active{opacity:1;transform:translateY(0)}
+@media(max-width:1024px){.about{grid-template-columns:1fr;gap:60px}.about-right{padding-top:0}.works-grid{grid-template-columns:repeat(2,1fr)}.works-list{grid-template-columns:repeat(2,1fr)}section{padding:100px 40px}nav{padding:20px 40px}.nav-links{display:none}}
+@media(max-width:768px){.works-grid,.works-list{grid-template-columns:1fr}.stats{grid-template-columns:1fr;gap:30px}footer{flex-direction:column;gap:20px;text-align:center}.modal{padding:30px}.modal-images{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="cursor"></div>
+<div class="cursor-ring"></div>
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="laser-container"><div class="laser-beam" style="width:60%"></div><div class="laser-beam" style="width:80%"></div><div class="laser-beam" style="width:50%"></div><div class="laser-beam" style="width:70%"></div><div class="laser-beam" style="width:40%"></div></div>
+<nav>
+<div class="logo">LASER<span style="color:var(--green)">.</span>CRAFT</div>
+<div class="nav-links"><a href="#about">关于</a><a href="#works">作品</a><a href="#skills">技能</a><a href="#journey">历程</a><a href="#contact">联系</a></div>
+</nav>
+<section class="hero"><div class="hero-content"><p class="hero-subtitle">LASER DESIGNER · CREATIVE DIRECTOR</p><h1 class="hero-title">激光设计<br><span class="highlight">JOY</span></h1><p class="hero-desc">用光影讲故事<br>让每一束激光都直击人心</p></div></section>
+<section id="about"><div class="section-label reveal">ABOUT</div><div class="about reveal"><div class="about-left"><h2>用光线<br>塑造<span>空间</span></h2></div><div class="about-right"><p>作为专业激光设计师，专注于将创意转化为震撼的视觉体验。从文旅夜游到大型演唱会，从山体秀到楼体Mapping，每一道光束都经过精密计算与艺术编排。</p><p><strong>工作流程：</strong><br>大纲 → 脚本 → 选曲 → 编程 → 音效配音 → DEMO → 现场执行</p><div class="stats"><div class="stat-item"><div class="stat-number">50<span>+</span></div><div class="stat-label">完成项目</div></div><div class="stat-item"><div class="stat-number">8<span>+</span></div><div class="stat-label">年经验</div></div><div class="stat-item"><div class="stat-number">20<span>+</span></div><div class="stat-label">城市足迹</div></div></div></div></div></section>
+<section id="works"><div class="section-label reveal">SELECTED WORKS</div><div class="works-grid" id="worksGrid"></div><a href="#all-works" class="more-works-btn reveal" id="moreWorksBtn">查看更多作品<svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></a></section>
+<section id="all-works" class="all-works-section"><div class="section-label">ALL WORKS</div><div class="works-list" id="worksList"></div></section>
+<section id="skills"><div class="section-label reveal">SKILLS</div><div class="skills-grid reveal"><div class="skill-card"><div class="skill-icon">💃</div><h3>激光舞编程</h3><p>将舞蹈与激光完美融合，创造舞台视觉盛宴</p></div><div class="skill-card"><div class="skill-icon">🏔️</div><h3>山体秀</h3><p>山体投影Mapping，让自然景观焕发新生命</p></div><div class="skill-card"><div class="skill-icon">🏢</div><h3>楼体Mapping</h3><p>城市地标投影，打造震撼夜游体验</p></div><div class="skill-card"><div class="skill-icon">📝</div><h3>脚本策划</h3><p>从创意大纲到分镜脚本，完整的故事表达</p></div><div class="skill-card"><div class="skill-icon">🎬</div><h3>DEMO制作</h3><p>预演效果呈现，确保现场万无一失</p></div><div class="skill-card"><div class="skill-icon">⚡</div><h3>效果编程</h3><p>BEYOND软件深度应用，精准控制每一束光</p></div><div class="skill-card"><div class="skill-icon">🎧</div><h3>音效配音</h3><p>音乐节奏同步，声光完美配合</p></div><div class="skill-card"><div class="skill-icon">🎯</div><h3>现场执行</h3><p>专业团队协作，确保演出顺利进行</p></div></div></section>
+<section id="journey"><div class="section-label reveal">JOURNEY</div><div class="timeline reveal"><div class="timeline-item"><div class="timeline-year">2025</div><div class="timeline-title">胡彦斌巡回演唱会</div><div class="timeline-desc">长沙站 · 镇江站 · 广州站 · 海宁站</div></div><div class="timeline-item"><div class="timeline-year">2024</div><div class="timeline-title">多地演唱会与文旅项目</div><div class="timeline-desc">南京朱正廷演唱会 · 成都MIYAVI演唱会 · 丹寨龙泉山山体秀</div></div><div class="timeline-item"><div class="timeline-year">2023</div><div class="timeline-title">演唱会与文旅全面开花</div><div class="timeline-desc">合肥星动音乐节 · 广州梁汉文演唱会 · 合肥万妮达演唱会 · 郑州法老活死人演唱会 · 老乡鸡鸡汤文化节</div></div><div class="timeline-item"><div class="timeline-year">2020-2022</div><div class="timeline-title">楼体Mapping深耕</div><div class="timeline-desc">完成多个城市楼体激光Mapping项目，涵盖安徽、江苏、浙江、福建、山东等地</div></div></div></section>
+<section id="contact" class="contact"><div class="reveal"><h2 class="contact-title">让光<br>照亮你的项目</h2><div class="contact-info"><a href="mailto:94008054@qq.com" class="contact-email">94008054@QQ.COM</a></div><div class="contact-links"><a class="contact-link" id="wechatBtn">微信</a><a href="mailto:94008054@qq.com" class="contact-link">邮箱</a><a class="contact-link" id="douyinBtn">抖音</a></div></div></section>
+<footer><div class="footer-left">© 2025 激光设计 JOY</div><div class="footer-right"><a id="footerWechat">微信</a><a href="mailto:94008054@qq.com">邮箱</a><a id="footerDouyin">抖音</a></div></footer>
+<div class="modal" id="workModal"><button class="modal-close" id="modalClose">×</button><div class="modal-content"><div class="modal-header"><div class="modal-category" id="modalCategory"></div><h2 class="modal-title" id="modalTitle"></h2><div class="modal-links" id="modalLinks"></div></div><div class="modal-images" id="modalImages"></div></div></div>
+<div class="qr-modal" id="qrModal"><div class="qr-content"><h3 id="qrTitle"></h3><div class="qr-placeholder" id="qrPlaceholder">请添加微信/抖音联系我</div><p id="qrDesc"></p><button class="qr-close" id="qrClose">关闭</button></div></div>
+<script src="data.js"></script>
+<script>
+// Cursor
+const cursor=document.querySelector('.cursor'),cursorRing=document.querySelector('.cursor-ring');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX-3+'px';cursor.style.top=e.clientY-3+'px';setTimeout(()=>{cursorRing.style.left=e.clientX-20+'px';cursorRing.style.top=e.clientY-20+'px'},50)});
+if('ontouchstart' in window){cursor.style.display='none';cursorRing.style.display='none'}
+
+// Reveal
+const reveals=document.querySelectorAll('.reveal');
+window.addEventListener('scroll',()=>reveals.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-150)el.classList.add('active')}));
+
+// Works - 精选6个
+const grid=document.getElementById('worksGrid');
+featured.forEach(w=>{
+    const c=document.createElement('div');
+    c.className='work-card';
+    c.innerHTML=`<img src="images/${w.f}/${coverImages[w.f]||'none.jpg'}" alt="${w.t}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22><rect fill=%22%23050508%22 width=%22400%22 height=%22300%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%2300ff87%22 font-size=%2212%22>IMAGE</text></svg>'"><div class="work-card-overlay"><div class="work-category">${w.f.substring(0,4)}</div><div class="work-title">${w.t}</div></div>`;
+    c.onclick=()=>openModal(w);
+    grid.appendChild(c);
+});
+
+// More Works - 全部23个
+const list=document.getElementById('worksList');
+allWorks.forEach(w=>{
+    const c=document.createElement('div');
+    c.className='work-card all-work';
+    c.innerHTML=`<img src="images/${w.f}/${coverImages[w.f]||'none.jpg'}" alt="${w.t}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22><rect fill=%22%23050508%22 width=%22400%22 height=%22300%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%2300ff87%22 font-size=%2212%22>IMAGE</text></svg>'"><div class="work-card-overlay"><div class="work-category">${w.f.substring(0,4)}</div><div class="work-title">${w.t}</div></div>`;
+    c.onclick=()=>openModal(w);
+    list.appendChild(c);
+});
+
+// Modal - 显示所有图片
+function openModal(w){
+    document.getElementById('modalCategory').textContent=w.f.substring(0,4);
+    document.getElementById('modalTitle').textContent=w.t;
+    const l=document.getElementById('modalLinks');
+    l.innerHTML=w.v.map(v=>`<a href="${v}" target="_blank" class="modal-link">▶ 视频</a>`).join('');
+    const im=document.getElementById('modalImages');
+    im.innerHTML='';
+    // 显示该文件夹所有图片
+    const imgs=allImages[w.f]||[];
+    imgs.forEach(imgName=>{
+        const img=document.createElement('img');
+        img.src=`images/${w.f}/${imgName}`;
+        img.className='modal-image';
+        img.alt=w.t;
+        img.onclick=()=>window.open(`images/${w.f}/${imgName}`,'_blank');
+        img.onerror=()=>img.style.display='none';
+        im.appendChild(img);
+    });
+    document.getElementById('workModal').classList.add('active');
+}
+document.getElementById('modalClose').onclick=()=>document.getElementById('workModal').classList.remove('active');
+document.getElementById('workModal').onclick=function(e){if(e.target===this)this.classList.remove('active')};
+document.getElementById('moreWorksBtn').onclick=function(e){e.preventDefault();document.getElementById('all-works').classList.add('active');document.getElementById('all-works').scrollIntoView({behavior:'smooth'})};
+
+// QR Modal - 显示二维码图片
+function showQR(type){
+    document.getElementById('qrTitle').textContent=type==='wechat'?'微信':'抖音';
+    document.getElementById('qrPlaceholder').innerHTML=`<img src="images/${type==='wechat'?'wechat-qr.png':'douyin-qr.png'}" alt="二维码" style="width:250px;height:250px;">`;
+    document.getElementById('qrDesc').textContent='长按保存二维码';
+    document.getElementById('qrModal').classList.add('active');
+}
+['wechatBtn','footerWechat'].forEach(id=>{if(document.getElementById(id))document.getElementById(id).onclick=()=>showQR('wechat')});
+['douyinBtn','footerDouyin'].forEach(id=>{if(document.getElementById(id))document.getElementById(id).onclick=()=>showQR('douyin')});
+document.getElementById('qrClose').onclick=()=>document.getElementById('qrModal').classList.remove('active');
+document.getElementById('qrModal').onclick=function(e){if(e.target===this)this.classList.remove('active')};
+</script>
+</body>
+</html>
